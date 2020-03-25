@@ -1,0 +1,158 @@
+version: 2
+# Reference variables.
+references:
+  docker_default: &docker_default
+    working_directory: /tmp/app
+    docker:
+      - image: node:12
+    environment:
+      TZ: '/usr/share/zoneinfo/Asia/Taipei'
+
+jobs:
+  build:
+    <<: *docker_default
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-12-cache-{{checksum "yarn.lock"}}
+            - node-12-cache
+      - run:
+          name: install dependencies
+          command: |
+            yarn config set cache-folder .yarn-cache
+            yarn --frozen-lockfile
+      - run:
+          name: build
+          command: npm run build
+      - save_cache:
+          key: node-12-cache-{{checksum "yarn.lock"}}
+          paths:
+            - .yarn-cache
+            - ./node_modules
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
+            - dist
+  lint:
+    <<: *docker_default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: run lint
+          command: npm run lint -- --color
+  test:
+    <<: *docker_default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: run test
+          command: npm run testonly:cov -- --no-cache --colors
+      - store_artifacts:
+          path: coverage
+          prefix: coverage
+      - store_test_results:
+          path: junit.xml
+  deploy:
+    working_directory: /tmp/app
+    docker:
+      - image: docker:18.09-git
+    environment:
+      DOCKER_REGISTRY_ADDR: yoctolhub.azurecr.io
+      REGISTRY_REPO_NAMESPACE: yoctolhub.azurecr.io/bots
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - setup_remote_docker
+      - restore_cache:
+          key: docker-layers
+      - run:
+          name: export env var
+          # use REPO name as default image name
+          # https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables
+          # If you need to interpolate other environment variables to set an environment variable,
+          # the only place to do this at the moment is in bash.
+          #
+          # to lowercase with bash
+          # https://stackoverflow.com/a/2264537
+          command: |
+            echo "export IMAGE_NAME=$(echo $CIRCLE_PROJECT_REPONAME | tr '[:upper:]' '[:lower:]')" | tee /dev/tty >> $BASH_ENV
+      - run:
+          name: Load layers from cache
+          command: |
+            for repoarchive in $(ls -1 /tmp/docker/cache/ | grep .tar); do
+              echo "Load \"$(basename $repoarchive)\"...";
+              docker load -i /tmp/docker/cache/$repoarchive;
+            done
+      - run:
+          name: Login yoctol registry
+          command: |
+            docker login \
+            -u $YT_DOCKER_REGISTRY_USERNAME \
+            -p $YT_DOCKER_REGISTRY_PASSWORD \
+            $DOCKER_REGISTRY_ADDR
+      - run:
+          name: Build images
+          command: |
+            source $BASH_ENV
+            docker build -t $IMAGE_NAME .
+      - run:
+          name: Print docker images
+          command: docker images --no-trunc --format "table {{.Repository}}\t{{.Tag}}\t{{.ID}}" | tee /tmp/docker-images.txt
+      - run:
+          name: archive docker layers
+          command: |
+            mkdir -p /tmp/docker/cache
+            for repo in $(docker images --format "{{.Repository}}" | sort | uniq); do
+              if [[ $repo != "<none>" ]]; then
+                echo "Save $repo repo layers...";
+                docker save -o "/tmp/docker/cache/$(echo $repo | sed 's:\/:\.:g').tar" $repo;
+              fi
+            done
+      - save_cache:
+          key: docker-layers-{{ checksum "/tmp/docker-images.txt" }}
+          paths:
+            - /tmp/docker/cache
+      - run:
+          name: Push images
+          command: |
+            source $BASH_ENV
+            docker tag $IMAGE_NAME "${REGISTRY_REPO_NAMESPACE}/${IMAGE_NAME}:${CIRCLE_TAG}"
+            docker tag $IMAGE_NAME "${REGISTRY_REPO_NAMESPACE}/${IMAGE_NAME}:latest"
+            docker push "${REGISTRY_REPO_NAMESPACE}/${IMAGE_NAME}"
+workflows:
+  version: 2
+  all-in-one:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - lint:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+      - deploy:
+          context: org-global
+          requires:
+            - test
+            - lint
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-.*)?/
+            branches:
+              ignore: /.*/
