@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build": "echo skip",
     "dev": "bottender dev",
     "lint": "eslint . --ext=js,ts",
     "start": "tsc && bottender start",
