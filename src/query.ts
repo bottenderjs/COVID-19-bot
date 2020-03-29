@@ -8,14 +8,18 @@ type CaseRecord = {
   recovered: number;
 };
 
-type CaseRecordIncludesAdded = CaseRecord & { added: number };
-
 let cached: { data?: Record<string, CaseRecord[]>; date?: Date } = {
   data: undefined,
   date: undefined,
 };
 
-async function query({ country, date }: { country: string; date: string }) {
+async function query({
+  country,
+  date,
+}: {
+  country: string;
+  date: string;
+}): Promise<(CaseRecord & { added: number } & { active: number }) | undefined> {
   const now = new Date();
   if (!cached.data || !cached.date || !isSameHour(cached.date, now)) {
     const response = await fetch(
@@ -32,9 +36,9 @@ async function query({ country, date }: { country: string; date: string }) {
   if (!cached.data) return;
 
   const foundRecord = cached.data[country]
-    .reduce((acc: CaseRecordIncludesAdded[], curr: CaseRecord) => {
+    .reduce((acc: (CaseRecord & { added: number })[], curr: CaseRecord) => {
       if (acc.length === 0) return [{ ...curr, added: 0 }];
-      const prev: CaseRecordIncludesAdded = acc[acc.length - 1];
+      const prev: CaseRecord & { added: number } = acc[acc.length - 1];
       return [...acc, { ...curr, added: curr.confirmed - prev.confirmed }];
     }, [])
     .find((record) => record.date === date);
