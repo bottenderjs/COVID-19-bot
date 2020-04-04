@@ -30,6 +30,11 @@ module.exports = {
       appId: process.env.MESSENGER_APP_ID,
       appSecret: process.env.MESSENGER_APP_SECRET,
       verifyToken: process.env.MESSENGER_VERIFY_TOKEN,
+      profile: {
+        getStarted: {
+          payload: 'GET_STARTED',
+        },
+      },
     },
     whatsapp: {
       enabled: false,

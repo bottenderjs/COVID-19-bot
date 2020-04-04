@@ -578,13 +578,6 @@
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
   integrity sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ==
 
-"@types/dotenv@^8.2.0":
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/@types/dotenv/-/dotenv-8.2.0.tgz#5cd64710c3c98e82d9d15844375a33bf1b45d053"
-  integrity sha512-ylSC9GhfRH7m1EUXBXofhgx4lUWmFeQDINW5oLuS+gxWdfUeW4zJdeVTYVkexEW+e2VUvlZR2kGnGGipAWR7kw==
-  dependencies:
-    dotenv "*"
-
 "@types/eslint-visitor-keys@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
@@ -611,13 +604,6 @@
     "@types/body-parser" "*"
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
-
-"@types/figures@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@types/figures/-/figures-3.0.1.tgz#dcb7222a8e63fd673d916f456019a405fd143acd"
-  integrity sha512-2OXodKWdNhYl+S+wCvlafqJbfMIVDfQZYX2wRyUOcRiEQpeJ9zU6cT7d+RbMpjS+/vmQ2cAUUL8gyGy1YxtLPw==
-  dependencies:
-    figures "*"
 
 "@types/fs-extra@^8.1.0":
   version "8.1.0"
@@ -1473,18 +1459,16 @@ body-parser@1.19.0, body-parser@^1.19.0:
     raw-body "2.4.0"
     type-is "~1.6.17"
 
-bottender@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/bottender/-/bottender-1.3.0.tgz#00bf45f35e7245b360d01732139460c39b814cd3"
-  integrity sha512-wVRuoBeNMW4xyEH/hTTO/GsH/T2wmWGXE2Z5D8dgDVfu47zWtU3HfCrpvz4UNZtqlq306Xx22LXixWu5hC45mA==
+bottender@^1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/bottender/-/bottender-1.3.3.tgz#a5c356566d3cd245c5494c57c10451ab0633d38d"
+  integrity sha512-luFQZ+10y7S5YixQJwIrz2fRbX/gKZQjmGJ5b4fu5epom63xvfBQHoSM3fYIcFYofmWiq7CZeWlydG3xqiySHg==
   dependencies:
     "@bottender/express" "^1.3.0"
     "@hapi/joi" "^15.1.1"
     "@slack/rtm-api" "^5.0.3"
     "@types/debug" "^4.1.5"
-    "@types/dotenv" "^8.2.0"
     "@types/express" "^4.17.2"
-    "@types/figures" "^3.0.1"
     "@types/fs-extra" "^8.1.0"
     "@types/hapi__joi" "^15.0.4"
     "@types/inquirer" "^6.5.0"
@@ -1523,7 +1507,7 @@ bottender@1.3.0:
     lodash "^4.17.15"
     lru-cache "^5.1.1"
     messaging-api-common "^1.0.0-beta.5"
-    messaging-api-line "^1.0.0-beta.11"
+    messaging-api-line "^1.0.0-beta.14"
     messaging-api-messenger "^1.0.0-beta.10"
     messaging-api-slack "^1.0.0-beta.10"
     messaging-api-telegram "^1.0.0-beta.5"
@@ -2266,7 +2250,7 @@ dot-prop@^5.2.0:
   dependencies:
     is-obj "^2.0.0"
 
-dotenv@*, dotenv@^8.2.0:
+dotenv@^8.2.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
   integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
@@ -2745,7 +2729,7 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "2.1.1"
 
-figures@*, figures@^3.0.0, figures@^3.2.0:
+figures@^3.0.0, figures@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/figures/-/figures-3.2.0.tgz#625c18bd293c604dc4a8ddb2febf0c88341746af"
   integrity sha512-yaduQFRKLXYOGgEn6AZau90j3ggSOyiqXU0F9JZfeXYhNa+Jk4X+s45A2zg5jns87GAFa34BBm2kXw4XpNcbdg==
@@ -4432,10 +4416,10 @@ messaging-api-common@^1.0.0-beta.5:
     snake-case "^2.1.0"
     url-join "^4.0.1"
 
-messaging-api-line@^1.0.0-beta.11:
-  version "1.0.0-beta.12"
-  resolved "https://registry.yarnpkg.com/messaging-api-line/-/messaging-api-line-1.0.0-beta.12.tgz#0da96b0e3182d5ec7556133113666130cce7838f"
-  integrity sha512-HqDRjJ3tBEg96Cb7unu7AzkIg5TIDIGkDRZlgSWUj8M+SYwBe6gKZqH5T0kywV6Li9O/Fh5bZhdPMcShxbU2TQ==
+messaging-api-line@^1.0.0-beta.14:
+  version "1.0.0-beta.14"
+  resolved "https://registry.yarnpkg.com/messaging-api-line/-/messaging-api-line-1.0.0-beta.14.tgz#df0f0dec204d88d1ea584052b8a7df899e2d1f87"
+  integrity sha512-AiHaUWFM9MDpgFzqhrTbs7PGNh/I2RaRLvB9uZwqeHBkKLpKcefC2aLIZuTYFVvcboyvS07mLetG7gjA8UiUFg==
   dependencies:
     axios "^0.19.0"
     axios-error "^1.0.0-beta.5"
