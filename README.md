@@ -42,7 +42,7 @@ Make your changes and tests, and make sure the tests pass.
 
 ## Development Setup
 
-To develop in your own accounts, you have to set up those channel separately:
+To develop with your own bot accounts, you have to set up those channel separately:
 
 - Messenger
 - Telegram
@@ -66,7 +66,7 @@ MESSENGER_VERIFY_TOKEN=
 To set the Messenger webhook and profile, run:
 
 ```sh
-npx bottender messenger webhook set ?
+npx bottender messenger webhook set -w <YOUR_WEBHOOK_ORIGIN>/webhooks/messenger
 npx bottender messenger profile set
 ```
 
@@ -81,7 +81,7 @@ TELEGRAM_ACCESS_TOKEN=
 To set the Telegram webhook, run:
 
 ```sh
-npx bottender telegram webhook set ?
+npx bottender telegram webhook set -w <YOUR_WEBHOOK_ORIGIN>/webhooks/telegram
 ```
 
 ### LINE
