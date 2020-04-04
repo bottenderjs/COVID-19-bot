@@ -12,8 +12,8 @@ The data mainly comes from [CSSEGISandData/COVID-19](https://github.com/CSSEGISa
 
 |               | Messenger     | Telegram      | LINE          |
 | ------------- | ------------- | ------------- | ------------- |
-| Link          | [m.me/102566934739079](m.me/102566934739079)  | [t.me/C_O_V_I_D_19_bot](t.me/C_O_V_I_D_19_bot)  | [line.me/R/ti/p/%40730jstoh](line.me/R/ti/p/%40730jstoh) |
-| QR Code       | | | |
+| Link          | [m.me/102566934739079](https://m.me/102566934739079)  | [t.me/C_O_V_I_D_19_bot](https://t.me/C_O_V_I_D_19_bot)  | [line.me/R/ti/p/%40730jstoh](https://line.me/R/ti/p/%40730jstoh) |
+| QR Code       | ![messenger](https://user-images.githubusercontent.com/3382565/78421806-2a473f00-768d-11ea-8f39-67ca8ccce2b8.png) | ![telegram](https://user-images.githubusercontent.com/3382565/78421810-2c110280-768d-11ea-8011-decec90213a9.png) | ![line](https://user-images.githubusercontent.com/3382565/78421809-2b786c00-768d-11ea-8a39-7feac6f54810.png) |
 
 ## Contributing
 
