@@ -1,10 +1,8 @@
-import {
-  Action,
-  MessengerContext,
-  LineContext,
-  TelegramContext,
-} from 'bottender';
+import { MessengerContext, LineContext, TelegramContext } from 'bottender';
 import { router, text, payload, line } from 'bottender/router';
+
+import Welcome from './actions/Welcome';
+import Unknown from './actions/Unknown';
 
 import query from './query';
 import countries from './countries.json';
@@ -16,25 +14,21 @@ async function DataNotFound(
 }
 
 function extractDate(str: string): string | undefined {
-  const result = str.match(/\d{4}-\d{1,2}-\d{1,2}/);
+  const result = str.match(
+    /(?<year>\d{4})(-|\/)(?<month>\d{1,2})(-|\/)(?<day>\d{1,2})/
+  );
 
-  if (!result) return;
+  if (!(result && result.groups)) return;
 
-  return result[0]; // TODO: normalize date string, for example: 2020/03/03
-}
+  const { groups } = result;
 
-async function Welcome(
-  context: MessengerContext | LineContext | TelegramContext
-): Promise<void> {
-  await context.sendText(`Welcome to the COVID-19 Bot
-...  
-`);
-}
+  const date = `${Number(groups.year)}-${Number(groups.month)}-${Number(
+    groups.day
+  )}`;
 
-async function Unknown(
-  context: MessengerContext | LineContext | TelegramContext
-): Promise<void> {
-  await context.sendText('Sorry, I don’t know what you say.');
+  if (Number.isNaN(new Date(date).getTime())) return undefined;
+
+  return date;
 }
 
 async function LatestGlobal(
@@ -47,12 +41,17 @@ async function LatestGlobal(
   }
 
   await context.sendText(`
+Country: Total
 Date: ${data.date}
-Added Case: ${data.added}
-Active Case: ${data.active}
-Confirmed Case: ${data.confirmed}
-Recovered Case: ${data.recovered}
-Deaths: ${data.deaths}
+
+Added Cases: ${data.added}
+Active Cases: ${data.active}
+Confirmed Cases: ${data.confirmed} 
+Recovered Cases: ${data.recovered} (${(
+    (data.recovered / data.confirmed) *
+    100
+  ).toFixed(2)}%)
+Deaths: ${data.deaths} (${((data.deaths / data.confirmed) * 100).toFixed(2)}%)
 `);
 }
 
@@ -68,11 +67,15 @@ async function LatestUS(
   await context.sendText(`
 Country: US
 Date: ${data.date}
-Added Case: ${data.added}
-Active Case: ${data.active}
-Confirmed Case: ${data.confirmed}
-Recovered Case: ${data.recovered}
-Deaths: ${data.deaths}
+
+Added Cases: ${data.added}
+Active Cases: ${data.active}
+Confirmed Cases: ${data.confirmed}
+Recovered Cases: ${data.recovered} (${(
+    (data.recovered / data.confirmed) *
+    100
+  ).toFixed(2)}%)
+Deaths: ${data.deaths} (${((data.deaths / data.confirmed) * 100).toFixed(2)}%)
 `);
 }
 
@@ -89,12 +92,32 @@ async function SpecifiedDate(
       };
     };
   }
-): Promise<void> {
+): Promise<any> {
   const date = `${Number(groups.year)}-${Number(groups.month)}-${Number(
     groups.day
   )}`;
 
-  await context.sendText(`SpecifiedDate: ${date}`);
+  // TODO: check invalid date
+
+  const data = await query({ country: 'global', date });
+
+  if (!data) {
+    return DataNotFound;
+  }
+
+  await context.sendText(`
+Country: Total
+Date: ${data.date}
+
+Added Cases: ${data.added}
+Active Cases: ${data.active}
+Confirmed Cases: ${data.confirmed} 
+Recovered Cases: ${data.recovered} (${(
+    (data.recovered / data.confirmed) *
+    100
+  ).toFixed(2)}%)
+Deaths: ${data.deaths} (${((data.deaths / data.confirmed) * 100).toFixed(2)}%)
+`);
 }
 
 async function HandleText(
@@ -105,11 +128,14 @@ async function HandleText(
   );
   const foundDate = extractDate(context.event.text);
 
-  if (!foundCountry || !foundDate) {
+  if (!foundCountry && !foundDate) {
     return Unknown;
   }
 
-  const data = await query({ country: foundCountry, date: foundDate });
+  const data = await query({
+    country: foundCountry ?? 'global',
+    date: foundDate,
+  });
 
   if (!data) {
     return DataNotFound;
@@ -118,11 +144,15 @@ async function HandleText(
   await context.sendText(`
 Country: ${foundCountry}
 Date: ${foundDate}
-Added Case: ${data.added}
-Active Case: ${data.active}
-Confirmed Case: ${data.confirmed}
-Recovered Case: ${data.recovered}
-Deaths: ${data.deaths}
+
+Added Cases: ${data.added}
+Active Cases: ${data.active}
+Confirmed Cases: ${data.confirmed}
+Recovered Cases: ${data.recovered} (${(
+    (data.recovered / data.confirmed) *
+    100
+  ).toFixed(2)}%)
+Deaths: ${data.deaths} (${((data.deaths / data.confirmed) * 100).toFixed(2)}%)
 `);
 }
 
@@ -135,7 +165,7 @@ export default async function App(): Promise<any> {
     payload('LATEST_GLOBAL', LatestGlobal),
     payload('LATEST_US', LatestUS),
 
-    text(/^\s*latest\s*$/i, LatestGlobal),
+    text(/(total|latest|global)/i, LatestGlobal),
     text(
       /^\s*(?<year>\d{4})(-|\/)(?<month>\d{1,2})(-|\/)(?<day>\d{1,2})\s*$/i,
       SpecifiedDate
