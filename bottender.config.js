@@ -34,6 +34,46 @@ module.exports = {
         getStarted: {
           payload: 'GET_STARTED',
         },
+        greeting: [
+          {
+            locale: 'default',
+            text: 'Hello {{user_first_name}}! Welcome to COVID-19 Bot!',
+          },
+        ],
+        persistentMenu: [
+          {
+            locale: 'default',
+            composerInputDisabled: false,
+            callToActions: [
+              {
+                type: 'postback',
+                title: 'Show the latest global numbers',
+                payload: 'LATEST_GLOBAL',
+              },
+              {
+                type: 'postback',
+                title: 'Show the latest US numbers',
+                payload: 'LATEST_US',
+              },
+              {
+                type: 'web_url',
+                title: 'WHO website',
+                url: 'https://www.who.int/',
+                webviewHeightRatio: 'full',
+              },
+            ],
+          },
+        ],
+        iceBreakers: [
+          {
+            question: 'Could you show me the latest global numbers?',
+            payload: 'LATEST_GLOBAL',
+          },
+          {
+            question: 'Could you show me the latest US numbers?',
+            payload: 'LATEST_US',
+          },
+        ],
       },
     },
     whatsapp: {

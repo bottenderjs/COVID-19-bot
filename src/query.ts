@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import isSameHour from 'date-fns/isSameHour';
+import mapValues from 'lodash/mapValues';
 
 type CaseRecord = {
   date: string;
@@ -8,18 +9,76 @@ type CaseRecord = {
   recovered: number;
 };
 
-let cached: { data?: Record<string, CaseRecord[]>; date?: Date } = {
+type EnhancedCaseRecord = CaseRecord & { active: number } & { added: number };
+
+let cached: {
+  data?: Record<string, EnhancedCaseRecord[]>;
+  date?: Date;
+} = {
   data: undefined,
   date: undefined,
 };
+
+function calcGlobalDate(data: Record<string, CaseRecord[]>): CaseRecord[] {
+  const records = Object.values(data).flat();
+
+  return records.reduce((acc: CaseRecord[], curr: CaseRecord) => {
+    const index = acc.findIndex(
+      (record: CaseRecord) => record.date === curr.date
+    );
+    if (index === -1) {
+      return [...acc, curr];
+    }
+
+    const targetRecord = acc[index];
+
+    return [
+      ...acc.slice(0, index),
+      {
+        date: targetRecord.date,
+        confirmed: targetRecord.confirmed + curr.confirmed,
+        deaths: targetRecord.deaths + curr.deaths,
+        recovered: targetRecord.recovered + curr.recovered,
+      },
+      ...acc.slice(index + 1, acc.length),
+    ];
+  }, []);
+}
+
+function enhanceData(
+  data: Record<string, CaseRecord[]>
+): Record<string, EnhancedCaseRecord[]> {
+  const globalData = calcGlobalDate(data);
+
+  const dataWithGlobalData: Record<string, CaseRecord[]> = {
+    ...data,
+    global: globalData,
+  };
+
+  return mapValues(dataWithGlobalData, (records: CaseRecord[]) =>
+    records
+      .map((record) => ({
+        ...record,
+        active: record.confirmed - record.recovered - record.deaths,
+      }))
+      .reduce(
+        (acc: EnhancedCaseRecord[], curr: CaseRecord & { active: number }) => {
+          if (acc.length === 0) return [{ ...curr, added: 0 }];
+          const prev: EnhancedCaseRecord = acc[acc.length - 1];
+          return [...acc, { ...curr, added: curr.confirmed - prev.confirmed }];
+        },
+        []
+      )
+  );
+}
 
 async function query({
   country,
   date,
 }: {
   country: string;
-  date: string;
-}): Promise<(CaseRecord & { added: number } & { active: number }) | undefined> {
+  date?: string;
+}): Promise<EnhancedCaseRecord | undefined> {
   const now = new Date();
   if (!cached.data || !cached.date || !isSameHour(cached.date, now)) {
     const response = await fetch(
@@ -28,27 +87,22 @@ async function query({
     const data: Record<string, CaseRecord[]> = await response.json();
 
     cached = {
-      data,
+      data: enhanceData(data),
       date: now,
     };
   }
 
   if (!cached.data) return;
 
-  const foundRecord = cached.data[country]
-    .reduce((acc: (CaseRecord & { added: number })[], curr: CaseRecord) => {
-      if (acc.length === 0) return [{ ...curr, added: 0 }];
-      const prev: CaseRecord & { added: number } = acc[acc.length - 1];
-      return [...acc, { ...curr, added: curr.confirmed - prev.confirmed }];
-    }, [])
-    .find((record) => record.date === date);
+  const countryData = cached.data[country];
+
+  const foundRecord = date
+    ? countryData.find((record) => record.date === date)
+    : countryData[countryData.length - 1];
 
   if (!foundRecord) return;
 
-  return {
-    ...foundRecord,
-    active: foundRecord.confirmed - foundRecord.recovered - foundRecord.deaths,
-  };
+  return foundRecord;
 }
 
 export default query;

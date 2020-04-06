@@ -3,18 +3,19 @@
   "version": "0.1.1",
   "private": true,
   "scripts": {
-    "build": "echo skip",
+    "build": "tsc",
     "dev": "bottender dev",
     "lint": "eslint . --ext=js,ts",
-    "start": "tsc && bottender start",
+    "start": "bottender start",
     "test": "npm run lint && npm run testonly",
     "testonly": "jest",
     "testonly:cov": "jest --coverage --runInBand --forceExit"
   },
   "dependencies": {
     "@types/node-fetch": "^2.5.5",
-    "bottender": "^1.3.3",
+    "bottender": "^1.4.0-beta.1",
     "date-fns": "^2.11.0",
+    "lodash": "^4.17.15",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
