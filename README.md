@@ -113,7 +113,7 @@ LINE_ACCESS_TOKEN=
 LINE_CHANNEL_SECRET=
 ```
 
-To set the LINE webhook, run:
+To set the LINE webhook, edit your webhook setting on LINE Developers Console.
 
 ## License
 
