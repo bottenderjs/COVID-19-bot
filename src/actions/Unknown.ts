@@ -16,7 +16,7 @@ export default async function Unknown(
         quickReplies: [
           {
             contentType: 'text',
-            title: 'total numbers',
+            title: 'Total numbers',
             payload: 'LATEST_GLOBAL',
           },
           {
@@ -38,13 +38,15 @@ export default async function Unknown(
               type: 'action',
               action: {
                 type: 'message',
-                text: 'total numbers',
+                label: 'Total numbers',
+                text: 'Total numbers',
               },
             },
             {
               type: 'action',
               action: {
                 type: 'message',
+                label: 'US',
                 text: 'US',
               },
             },
@@ -52,6 +54,7 @@ export default async function Unknown(
               type: 'action',
               action: {
                 type: 'message',
+                label: 'US 2020-4-5',
                 text: 'US 2020-4-5',
               },
             },
@@ -63,7 +66,7 @@ export default async function Unknown(
           keyboard: [
             [
               {
-                text: 'total numbers',
+                text: 'Total numbers',
               },
               {
                 text: 'US',

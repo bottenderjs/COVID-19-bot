@@ -17,7 +17,7 @@ This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided b
         quickReplies: [
           {
             contentType: 'text',
-            title: 'total numbers',
+            title: 'Total numbers',
             payload: 'LATEST_GLOBAL',
           },
           {
@@ -39,13 +39,15 @@ This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided b
               type: 'action',
               action: {
                 type: 'message',
-                text: 'total numbers',
+                label: 'Total numbers',
+                text: 'Total numbers',
               },
             },
             {
               type: 'action',
               action: {
                 type: 'message',
+                label: 'US',
                 text: 'US',
               },
             },
@@ -53,6 +55,7 @@ This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided b
               type: 'action',
               action: {
                 type: 'message',
+                label: 'US 2020-4-5',
                 text: 'US 2020-4-5',
               },
             },
@@ -64,7 +67,7 @@ This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided b
           keyboard: [
             [
               {
-                text: 'total numbers',
+                text: 'Total numbers',
               },
               {
                 text: 'US',

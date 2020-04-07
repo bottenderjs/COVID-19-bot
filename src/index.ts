@@ -64,7 +64,8 @@ Deaths: ${data.deaths.toLocaleString()} (${(
   ).toFixed(2)}%)
 Active: ${data.active.toLocaleString()}`);
   if (topConfirmedCountries && topAddedCountries) {
-    await context.sendText(`
+    await context.sendText(
+      `
 Confirmed Cases by Country 👇🏻 
 ${topConfirmedCountries
   .map(
@@ -74,7 +75,38 @@ ${topConfirmedCountries
 Today Added Cases by Country 👇🏻
 ${topAddedCountries
   .map(({ country, record }) => `  ${record.added.toLocaleString()} ${country}`)
-  .join('\n')}`);
+  .join('\n')}`,
+      {
+        ...(context.platform === 'messenger' && {
+          quickReplies: topConfirmedCountries.map(({ country }) => ({
+            contentType: 'text',
+            title: country,
+            payload: country,
+          })),
+        }),
+        ...(context.platform === 'line' && {
+          quickReply: {
+            items: topConfirmedCountries.map(({ country }) => ({
+              type: 'action',
+              action: {
+                type: 'message',
+                label: country,
+                text: country,
+              },
+            })),
+          },
+        }),
+        ...(context.platform === 'telegram' && {
+          replyMarkup: {
+            keyboard: [
+              topConfirmedCountries.map(({ country }) => ({
+                text: country,
+              })),
+            ],
+          },
+        }),
+      }
+    );
   }
 }
 
