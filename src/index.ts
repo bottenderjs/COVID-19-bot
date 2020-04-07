@@ -4,7 +4,7 @@ import { router, text, payload, line } from 'bottender/router';
 import Welcome from './actions/Welcome';
 import Unknown from './actions/Unknown';
 
-import query from './query';
+import { queryCountryCases, queryMostCasesTopNCountries } from './query';
 import countries from './countries.json';
 
 async function DataNotFound(
@@ -34,49 +34,74 @@ function extractDate(str: string): string | undefined {
 async function LatestGlobal(
   context: MessengerContext | LineContext | TelegramContext
 ): Promise<any> {
-  const data = await query({ country: 'global' });
+  const data = await queryCountryCases({ country: 'global' });
+  const topAddedCountries = await queryMostCasesTopNCountries({
+    type: 'added',
+    n: 5,
+  });
+  const topConfirmedCountries = await queryMostCasesTopNCountries({
+    type: 'confirmed',
+    n: 5,
+  });
 
   if (!data) {
     return DataNotFound;
   }
 
-  await context.sendText(`
-Country: Total
-Date: ${data.date}
+  await context.sendText(`Here's the COVID-19 numbers in the world: 
+📆: ${data.date}
 
-Added Cases: ${data.added}
-Active Cases: ${data.active}
-Confirmed Cases: ${data.confirmed} 
-Recovered Cases: ${data.recovered} (${(
+Added: ${data.added.toLocaleString()}
+Confirmed: ${data.confirmed.toLocaleString()} 
+
+Recovered: ${data.recovered.toLocaleString()} (${(
     (data.recovered / data.confirmed) *
     100
   ).toFixed(2)}%)
-Deaths: ${data.deaths} (${((data.deaths / data.confirmed) * 100).toFixed(2)}%)
-`);
+Deaths: ${data.deaths.toLocaleString()} (${(
+    (data.deaths / data.confirmed) *
+    100
+  ).toFixed(2)}%)
+Active: ${data.active.toLocaleString()}`);
+  if (topConfirmedCountries && topAddedCountries) {
+    await context.sendText(`
+Confirmed Cases by Country 👇🏻 
+${topConfirmedCountries
+  .map(
+    ({ country, record }) => `  ${record.confirmed.toLocaleString()} ${country}`
+  )
+  .join('\n')}
+Today Added Cases by Country 👇🏻
+${topAddedCountries
+  .map(({ country, record }) => `  ${record.added.toLocaleString()} ${country}`)
+  .join('\n')}`);
+  }
 }
 
 async function LatestUS(
   context: MessengerContext | LineContext | TelegramContext
 ): Promise<any> {
-  const data = await query({ country: 'US' });
+  const data = await queryCountryCases({ country: 'US' });
 
   if (!data) {
     return DataNotFound;
   }
 
-  await context.sendText(`
-Country: US
-Date: ${data.date}
+  await context.sendText(`Here's the COVID-19 numbers in US:
+📆: ${data.date}
 
-Added Cases: ${data.added}
-Active Cases: ${data.active}
-Confirmed Cases: ${data.confirmed}
-Recovered Cases: ${data.recovered} (${(
+Added: ${data.added.toLocaleString()}
+Confirmed: ${data.confirmed.toLocaleString()}
+
+Recovered: ${data.recovered.toLocaleString()} (${(
     (data.recovered / data.confirmed) *
     100
   ).toFixed(2)}%)
-Deaths: ${data.deaths} (${((data.deaths / data.confirmed) * 100).toFixed(2)}%)
-`);
+Deaths: ${data.deaths.toLocaleString()} (${(
+    (data.deaths / data.confirmed) *
+    100
+  ).toFixed(2)}%)
+Active: ${data.active.toLocaleString()}`);
 }
 
 async function SpecifiedDate(
@@ -99,32 +124,36 @@ async function SpecifiedDate(
 
   // TODO: check invalid date
 
-  const data = await query({ country: 'global', date });
+  const data = await queryCountryCases({ country: 'global', date });
 
   if (!data) {
     return DataNotFound;
   }
 
-  await context.sendText(`
-Country: Total
-Date: ${data.date}
+  await context.sendText(`Here's the COVID-19 numbers in the world:
+📆: ${data.date}
 
-Added Cases: ${data.added}
-Active Cases: ${data.active}
-Confirmed Cases: ${data.confirmed} 
-Recovered Cases: ${data.recovered} (${(
+Added: ${data.added.toLocaleString()}
+Confirmed: ${data.confirmed.toLocaleString()} 
+
+Recovered: ${data.recovered.toLocaleString()} (${(
     (data.recovered / data.confirmed) *
     100
   ).toFixed(2)}%)
-Deaths: ${data.deaths} (${((data.deaths / data.confirmed) * 100).toFixed(2)}%)
-`);
+Deaths: ${data.deaths.toLocaleString()} (${(
+    (data.deaths / data.confirmed) *
+    100
+  ).toFixed(2)}%)
+Active: ${data.active.toLocaleString()}`);
 }
 
 async function HandleText(
   context: MessengerContext | LineContext | TelegramContext
 ): Promise<any> {
   const foundCountry = countries.find((country) =>
-    context.event.text.includes(country.replace(/\*/g, ''))
+    context.event.text
+      .toLowerCase()
+      .includes(country.replace(/\*/g, '').toLowerCase())
   );
   const foundDate = extractDate(context.event.text);
 
@@ -132,7 +161,7 @@ async function HandleText(
     return Unknown;
   }
 
-  const data = await query({
+  const data = await queryCountryCases({
     country: foundCountry ?? 'global',
     date: foundDate,
   });
@@ -141,19 +170,23 @@ async function HandleText(
     return DataNotFound;
   }
 
-  await context.sendText(`
-Country: ${foundCountry}
-Date: ${foundDate}
+  await context.sendText(`Here's the COVID-19 numbers in ${
+    foundCountry ?? 'the world'
+  }:
+📆: ${data.date}
 
-Added Cases: ${data.added}
-Active Cases: ${data.active}
-Confirmed Cases: ${data.confirmed}
-Recovered Cases: ${data.recovered} (${(
+Added: ${data.added.toLocaleString()}
+Confirmed: ${data.confirmed.toLocaleString()}
+
+Recovered: ${data.recovered.toLocaleString()} (${(
     (data.recovered / data.confirmed) *
     100
   ).toFixed(2)}%)
-Deaths: ${data.deaths} (${((data.deaths / data.confirmed) * 100).toFixed(2)}%)
-`);
+Deaths: ${data.deaths.toLocaleString()} (${(
+    (data.deaths / data.confirmed) *
+    100
+  ).toFixed(2)}%)
+Active: ${data.active.toLocaleString()}`);
 }
 
 export default async function App(): Promise<any> {

@@ -72,13 +72,7 @@ function enhanceData(
   );
 }
 
-async function query({
-  country,
-  date,
-}: {
-  country: string;
-  date?: string;
-}): Promise<EnhancedCaseRecord | undefined> {
+async function refetchDataHourly(): Promise<void> {
   const now = new Date();
   if (!cached.data || !cached.date || !isSameHour(cached.date, now)) {
     const response = await fetch(
@@ -91,6 +85,16 @@ async function query({
       date: now,
     };
   }
+}
+
+export async function queryCountryCases({
+  country,
+  date,
+}: {
+  country: string;
+  date?: string;
+}): Promise<EnhancedCaseRecord | undefined> {
+  await refetchDataHourly();
 
   if (!cached.data) return;
 
@@ -105,4 +109,23 @@ async function query({
   return foundRecord;
 }
 
-export default query;
+export async function queryMostCasesTopNCountries({
+  type,
+  n = 3,
+}: {
+  type: 'confirmed' | 'deaths' | 'recovered' | 'active' | 'added';
+  n?: number;
+}): Promise<{ country: string; record: EnhancedCaseRecord }[] | undefined> {
+  await refetchDataHourly();
+
+  if (!cached.data) return;
+
+  return Object.entries(cached.data)
+    .map(([country, records]) => ({
+      country,
+      record: records[records.length - 1],
+    }))
+    .filter(({ country }) => country !== 'global')
+    .sort((a, b) => b.record[type] - a.record[type])
+    .slice(0, n);
+}

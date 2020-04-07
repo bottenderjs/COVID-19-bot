@@ -64,16 +64,6 @@ module.exports = {
             ],
           },
         ],
-        iceBreakers: [
-          {
-            question: 'Could you show me the latest global numbers?',
-            payload: 'LATEST_GLOBAL',
-          },
-          {
-            question: 'Could you show me the latest US numbers?',
-            payload: 'LATEST_US',
-          },
-        ],
       },
     },
     whatsapp: {
