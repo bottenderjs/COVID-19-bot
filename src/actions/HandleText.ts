@@ -47,21 +47,57 @@ export default async function HandleText(
     return DataNotFound;
   }
 
-  await context.sendText(`Here's the COVID-19 numbers in ${
-    foundCountry ?? 'the world'
-  }:
+  await context.sendText(
+    `Here's the COVID-19 numbers in ${foundCountry ?? 'the world'}:
 📆: ${data.date}
 
 Added: ${data.added.toLocaleString()}
 Confirmed: ${data.confirmed.toLocaleString()}
 
 Recovered: ${data.recovered.toLocaleString()} (${(
-    (data.recovered / data.confirmed) *
-    100
-  ).toFixed(2)}%)
+      (data.recovered / data.confirmed) *
+      100
+    ).toFixed(2)}%)
 Deaths: ${data.deaths.toLocaleString()} (${(
-    (data.deaths / data.confirmed) *
-    100
-  ).toFixed(2)}%)
-Active: ${data.active.toLocaleString()}`);
+      (data.deaths / data.confirmed) *
+      100
+    ).toFixed(2)}%)
+Active: ${data.active.toLocaleString()}`,
+    {
+      ...(context.platform === 'messenger' && {
+        quickReplies: [
+          {
+            contentType: 'text',
+            title: 'Total numbers',
+            payload: 'Total numbers',
+          },
+        ],
+      }),
+      ...(context.platform === 'line' && {
+        quickReply: {
+          items: [
+            {
+              type: 'action',
+              action: {
+                type: 'message',
+                label: 'Total numbers',
+                text: 'Total numbers',
+              },
+            },
+          ],
+        },
+      }),
+      ...(context.platform === 'telegram' && {
+        replyMarkup: {
+          keyboard: [
+            [
+              {
+                text: 'Total numbers',
+              },
+            ],
+          ],
+        },
+      }),
+    }
+  );
 }
