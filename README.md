@@ -6,7 +6,27 @@ The data mainly comes from [CSSEGISandData/COVID-19](https://github.com/CSSEGISa
 
 ## Features
 
-> TBD
+- Enter "total" to get the global numbers.
+- Enter a country to get the numbers of the specified country, for example: "US".
+- Enter a country and a date to get the numbers of the specified country in the specified date, for example: "US 2020-4-5".
+
+### Screenshots
+
+**Messenger:**
+
+![messenger](https://user-images.githubusercontent.com/3382565/78641840-61635d80-78e4-11ea-8b41-85b9fb2e84dc.png)
+
+**Telegram:**
+
+![telegram](https://user-images.githubusercontent.com/3382565/78641867-6b855c00-78e4-11ea-92d3-73e80855e110.png)
+
+**LINE:**
+
+![line](https://user-images.githubusercontent.com/3382565/78641866-6a542f00-78e4-11ea-85c5-10d461eb4374.png)
+
+**Terminal:**
+
+![](https://user-images.githubusercontent.com/3382565/78642816-e602ab80-78e5-11ea-8235-125a87573221.gif)
 
 ## Bot Links
 
