@@ -69,9 +69,13 @@ This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided b
               {
                 text: 'Total numbers',
               },
+            ],
+            [
               {
                 text: 'US',
               },
+            ],
+            [
               {
                 text: 'US 2020-4-5',
               },

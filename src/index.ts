@@ -98,11 +98,11 @@ ${topAddedCountries
         }),
         ...(context.platform === 'telegram' && {
           replyMarkup: {
-            keyboard: [
-              topConfirmedCountries.map(({ country }) => ({
+            keyboard: topConfirmedCountries.map(({ country }) => [
+              {
                 text: country,
-              })),
-            ],
+              },
+            ]),
           },
         }),
       }

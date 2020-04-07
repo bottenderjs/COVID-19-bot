@@ -68,9 +68,13 @@ export default async function Unknown(
               {
                 text: 'Total numbers',
               },
+            ],
+            [
               {
                 text: 'US',
               },
+            ],
+            [
               {
                 text: 'US 2020-4-5',
               },
