@@ -64,9 +64,13 @@ Deaths: ${data.deaths.toLocaleString()} (${(
   ).toFixed(2)}%)
 Active: ${data.active.toLocaleString()}`);
   if (topConfirmedCountries && topAddedCountries) {
+    // The bot need to reply to LINE in a single request, so it's no help to wait between messages.
+    if (context.platform !== 'line') {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
     await context.sendText(
-      `
-Confirmed Cases by Country 👇🏻 
+      `Confirmed Cases by Country 👇🏻 
 ${topConfirmedCountries
   .map(
     ({ country, record }) => `  ${record.confirmed.toLocaleString()} ${country}`
