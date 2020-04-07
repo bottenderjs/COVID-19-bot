@@ -5,10 +5,16 @@ export default async function Welcome(
 ): Promise<void> {
   await context.sendText(
     `Welcome to the COVID-19 Bot.
-This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided by JHU CSSE.
-  
-  
-- Enter "total" to get the global numbers.
+This bot can show you the data of Novel Coronavirus (COVID-19) cases, provided by JHU CSSE.`
+  );
+
+  // The bot need to reply to LINE in a single request, so it's no help to wait between messages.
+  if (context.platform !== 'line') {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  await context.sendText(
+    `- Enter "total" to get the global numbers.
 - Enter a country to get the numbers of the specified country, for example: "US".
 - Enter a country and a date to get the numbers of the specified country in the specified date, for example: "US 2020-4-5".
   `,
